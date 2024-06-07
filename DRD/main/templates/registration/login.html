@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+    <meta charset="UTF-8">
+	<title>Login Page</title>
+    {% load static %}
+	<link rel="stylesheet" href="{% static 'css/login.css' %}">
+	<style>
+        .pass {
+            position: relative;
+        }
+
+        .eye-icon {
+            position: absolute;
+            top: 50%;
+            right : 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        .text {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    {% include 'registration/header.html' %}
+	<div class="container">
+		
+		<div class="card">
+			<h1>Login</h1>
+            <div class="text">
+                {% for message in messages %}
+                    {% comment %} <ul style='color:#ff3b49'> {% endcomment %}
+                    <ul>
+                        {{message}}
+                    <ul>
+                {% endfor %}
+            </div>
+			
+
+                
+			<form method="POST"> 
+				{% csrf_token %}
+				<label for="username">Username</label>
+				<input type="text" id="username" name="username" required>
+
+				<label for="password" >Password</label>
+				<div class =pass>
+					<input type="password" id="password" name="password" required >
+				    <img src="https://res.cloudinary.com/dhva31opb/image/upload/v1686759945/eye-close_aw8s6d.png" id="eyeicon" class="eye-icon">
+				</div>
+				<button type="submit" onclick="validate() ">Login</button>
+                <hr>
+				<div class="sign-up">
+					Don't have an account? <a href="{% url 'main:signup' %}">Create One</a>
+				</div>
+			</form>
+		</div>
+	</div>
+	<script >
+	/*var user=document.querySelector('#username');
+	user.addEventListener('keyup',function(){
+    var u_times=document.querySelector('.u_times');
+    var u_check=document.querySelector('.u_check');
+    if(user.value.length == 0 || user.value.length < 6){
+        user.style.border='1px solid red';
+        u_times.style.display='block';
+        u_check.style.display='none';
+        return false;
+    }
+    else{
+        user.style.border='1px solid green';
+        u_times.style.display='none';
+        u_check.style.display='block';
+
+
+    }
+})
+var pass=document.querySelector('#password');
+pass.addEventListener('keyup',function(){
+    var p_times=document.querySelector('.p_times');
+    var p_check=document.querySelector('.p_check');
+    if(pass.value.length == 0 || pass.value.length < 10 || pass.value.match(/[0-9]/)==null || pass.value.match(/[A-Z]/)==null || pass.value.match(/[a-z]/)==null || pass.value.match(/[@\!\#\$\%\^\&\*\(\)\_\+\-\=\?\>\<\.\,]/)==null ){
+        pass.style.border='1px solid red';
+        p_times.style.display='block';
+        p_check.style.display='none';
+        return false;
+    }
+    else{
+        pass.style.border='1px solid green';
+        p_times.style.display='none';
+        p_check.style.display='block';
+            }
+    }
+)
+function validate() {
+    if (user.value==0 || user.value.length<6){
+        document.getElementById('error').innerHTML='incorrect username';
+        return false;
+    }
+    else if(pass.value==0 || pass.value.length<10){
+        document.getElementById('error').innerHTML='incorrect password';
+        return false;
+    }
+    else{
+        alert('Successfully logged in' );
+        redirect();
+    }
+}*/
+
+let eyeicon =document.getElementById("eyeicon");
+		let password =document.getElementById("password");
+
+		eyeicon.onclick =function(){
+			if(password.type =="password"){
+				password.type ="text";
+				eyeicon.src ='https://res.cloudinary.com/dhva31opb/image/upload/v1686759944/eye-open_a3resw.png';
+			}else{
+				password.type="password";
+				eyeicon.src ="https://res.cloudinary.com/dhva31opb/image/upload/v1686759945/eye-close_aw8s6d.png";
+			}
+		}
+/*function redirect(){
+    alert('redirecting' );
+    window.open('otp.html');
+
+} */ 
+	</script>
+</body>
+</html>

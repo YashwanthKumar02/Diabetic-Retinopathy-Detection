@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static '/css/register.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: fit-content;
+        }
+        
+        .card {
+            background-color: #fff;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            border-radius: 5px;
+            height: fit-content;
+            width: 50%;
+           margin-top: 35px;
+             
+        }
+        .pass {
+            position: relative;
+        }
+        
+        .eye-icon {
+            position: absolute;
+            top: 50%;
+            right : 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        .content {
+            margin: 10px 0 10px;
+          }
+          .content p {
+            color: #333;
+            font-size: 1.05rem;
+          }
+          .content .requirement-list {
+            margin-top: 20px;
+          }
+          .requirement-list li {
+            font-size: 0.95rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+          }
+          .requirement-list li i {
+            width: 20px;
+            color: #aaa;
+            font-size: 0.45rem;
+          }
+          .requirement-list li.valid i {
+            font-size: 0.95rem;
+            color: #4285F4;
+          }
+          .requirement-list li span {
+            margin-left: 12px;
+            color: #333;
+          }
+          .requirement-list li.valid span {
+            color: #999;
+          }
+          .text {
+            text-align: center;
+          } 
+    </style>
+    
+</head>
+<body>
+    {% include 'registration/header.html' %}
+    <div class="container">
+        <div class="card">
+            <h1>Sign Up</h1>
+            <div class="text">
+            {% if errors %}
+                <ul>
+                {% for error in errors %}
+                    <li>{{error}}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+                {% for message in messages %}
+                    <ul>
+                        {{message}}
+                    <ul>
+                {% endfor %}
+            </div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <label for="username">Username</label>
+				<input type="text" id="username" name="username" placeholder="Create a username (only letters and numbers)" required>
+                
+
+                <label for="fname">First Name</label>
+				<input type="text" id="fname" name="fname" placeholder="Enter Your First Name"  required>
+                
+
+                 
+                <label for="lname">Last Name</label>
+				<input type="text" id="lname" name="lname" placeholder="Enter Your Last Name"  required>
+        
+
+                <label for="email">Email</label>
+				<input type="email" id="email" name="email" placeholder="Enter Your Email" required>
+
+                <label for="password">Password</label>
+				<div class =pass>
+					<input type="password" id="password" name="pass1" placeholder="Enter Your Password" required >
+				    <img src="https://res.cloudinary.com/dhva31opb/image/upload/v1686759945/eye-close_aw8s6d.png" id="eyeicon" class="eye-icon">
+				</div>
+                <div class="content">
+                    <p>Password must contains</p>
+                    <ul class="requirement-list">
+                      <li>
+                        <i class="fa-solid fa-circle"></i>
+                        <span>At least 8 characters length</span>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-circle"></i>
+                        <span>At least 1 number (0...9)</span>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-circle"></i>
+                        <span>At least 1 lowercase letter (a...z)</span>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-circle"></i>
+                        <span>At least 1 special symbol (!...$)</span>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-circle"></i>
+                        <span>At least 1 uppercase letter (A...Z)</span>
+                      </li>
+                    </ul>
+                </div>
+                <label for="password">Confirm Password</label>
+                <div class =pass>
+					<input type="password" id="cpassword" name="pass2" placeholder="Confirm Your Password" required >
+				    <img src="https://res.cloudinary.com/dhva31opb/image/upload/v1686759945/eye-close_aw8s6d.png" id="ceyeicon" class="eye-icon">
+                    
+                </div>
+                <span id='message'></span>
+
+                <p>Have an account? Login <a href="{% url 'main:login' %}">here</a></p>
+
+                <button type="submit" onclick="cheackpassword()">Signup</button>
+            </form>
+        </div>
+    </div>
+    <script src="/static/js/register.js"></script>
+    <script>
+        
+//password validation
+const passwordInput = document.querySelector(".pass input");
+// const eyeIcon = document.querySelector(".pass-field i");
+const requirementList = document.querySelectorAll(".requirement-list li");
+
+// An array of password requirements with corresponding 
+// regular expressions and index of the requirement list item
+const requirements = [
+    { regex: /.{8,}/, index: 0 }, // Minimum of 8 characters
+    { regex: /[0-9]/, index: 1 }, // At least one number
+    { regex: /[a-z]/, index: 2 }, // At least one lowercase letter
+    { regex: /[^A-Za-z0-9]/, index: 3 }, // At least one special character
+    { regex: /[A-Z]/, index: 4 }, // At least one uppercase letter
+]
+
+passwordInput.addEventListener("keyup", (e) => {
+    requirements.forEach(item => {
+        // Check if the password matches the requirement regex
+        const isValid = item.regex.test(e.target.value);
+        const requirementItem = requirementList[item.index];
+
+        // Updating class and icon of requirement item if requirement matched or not
+        if (isValid) {
+            requirementItem.classList.add("valid");
+            requirementItem.firstElementChild.className = "fa-solid fa-check";
+        } else {
+            requirementItem.classList.remove("valid");
+            requirementItem.firstElementChild.className = "fa-solid fa-circle";
+        }
+    });
+});
+
+//confirm password validation
+$(' #cpassword').on('keyup', function () {
+    if ($('#password').val() == $('#cpassword').val()) {
+      $('#message').html('Matching').css('color', 'green');
+    } else 
+      $('#message').html('Not Matching').css('color', 'red');
+  })
+
+</script>
+
+</body>
+</html>
