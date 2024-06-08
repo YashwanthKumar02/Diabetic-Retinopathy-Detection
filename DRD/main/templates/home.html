@@ -3,9 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Home</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: fit-content;
+        }
+        
+        .card {
+            background-color: #fff;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            border-radius: 5px;
+            height: fit-content;
+            width: 50%;
+            margin-top: 35px;
+        }
+    </style>
 </head>
-<body>
-    Home
+<body style="background-color: rgb(194, 194, 194);">
+    {% include 'registration/header.html' %}
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container" style="margin-top: 50px;">
+            <div class="card" style="width: 50%; margin: auto;">
+                <div class="card-body">
+                    <h3>Hi, {{user}}</h3>
+                    <h5 class="card-title">Upload Image</h5>
+                    <input type="file" name="image" class="form-control" style="margin-bottom: 10px;">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                    {% if value %}
+                        <h5 style="margin-top: 10px;">Prediction: {{value}} {{classes}}</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
 </body>
 </html>

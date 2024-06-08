@@ -79,14 +79,17 @@ WSGI_APPLICATION = 'DRD.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 # settings.py
+
+from . import creds
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dr_project',
-        'USER': 'yashwanth',
-        'PASSWORD': '30028072',
-        'HOST': 'localhost',  # Or your database server's IP address
-        'PORT': '5432',       # Default PostgreSQL port
+        'NAME': creds.name,
+        'USER': creds.user,
+        'PASSWORD': creds.password,
+        'HOST': creds.host,  # Or your database server's IP address
+        'PORT': creds.port,       # Default PostgreSQL port
     }
 }
 
@@ -139,3 +142,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

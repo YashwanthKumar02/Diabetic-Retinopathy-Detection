@@ -19,19 +19,48 @@ from django.db.models import Q
 from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.core.exceptions import ValidationError
+from .models import *
+import os
+from PIL import Image
+from django.conf import settings
+from .model import *
+from django.core.files.storage import default_storage
 
 # Create your views here.
 
-def home(request):
-    return render(request, 'home.html')
 
-def normalize_username(username):
-    return username.lower()
+def home(request):
+    user = request.user
+    print(user)
+    context = {'user': user}
+
+    if request.method == 'POST' and 'image' in request.FILES:
+        image_file = request.FILES['image']
+        
+        # Save the uploaded file to the media directory
+        image_name = default_storage.save(image_file.name, image_file)
+        image_path = os.path.join(settings.MEDIA_ROOT, image_name)
+
+        # Call the processing function
+        try:
+            value, classes = main(image_path)
+            print(value, classes)
+            context['value'] = value
+            context['classes'] = classes
+        except Exception as e:
+            print(f"Error processing image: {e}")
+            context['error'] = "An error occurred while processing the image."
+
+        return render(request, 'home.html', context)
+    
+    if user.is_authenticated:
+        return render(request, 'home.html', context)
+    else:
+        return redirect('main:login')
 
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
-        username = normalize_username(username)
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
