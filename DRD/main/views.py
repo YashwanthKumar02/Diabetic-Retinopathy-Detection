@@ -25,38 +25,55 @@ from PIL import Image
 from django.conf import settings
 from .model import *
 from django.core.files.storage import default_storage
+import logging
+from .forms import ImageUploadForm
+from django.contrib.auth.decorators import user_passes_test
+from django.utils import timezone
 
-# Create your views here.
+# Set up logging
+logger = logging.getLogger(__name__)
 
+def is_not_staff(user):
+    return not user.is_staff
 
+@login_required
+@user_passes_test(is_not_staff, login_url='main:login')
 def home(request):
-    user = request.user
-    print(user)
-    context = {'user': user}
+    form = ImageUploadForm()
+    username = request.user.username
+    user = User.objects.get(username=username)
+    context = {'username': username, 'form': form, 'diagnosis_record': user.diagnosis_record}
 
-    if request.method == 'POST' and 'image' in request.FILES:
-        image_file = request.FILES['image']
-        
-        # Save the uploaded file to the media directory
-        image_name = default_storage.save(image_file.name, image_file)
-        image_path = os.path.join(settings.MEDIA_ROOT, image_name)
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            if 'image' in request.FILES:
+                image_file = request.FILES['image']
+                context['check_flag'] = True
+                image_name = default_storage.save(image_file.name, image_file)
+                image_path = os.path.join(settings.MEDIA_ROOT, image_name)
+                
+                try:
+                    value, classes = main(image_path)
+                    context['value'] = value
+                    context['classes'] = str(classes)
+                    if user.diagnosis_record:
+                        context['previous_diagnosis_value'] = user.previous_diagnosis_value
+                        context['previous_diagnosis_class'] = user.previous_diagnosis_class
+                        context['uploaded_at'] = user.uploaded_at
 
-        # Call the processing function
-        try:
-            value, classes = main(image_path)
-            print(value, classes)
-            context['value'] = value
-            context['classes'] = classes
-        except Exception as e:
-            print(f"Error processing image: {e}")
-            context['error'] = "An error occurred while processing the image."
+                    if (timezone.now() - user.uploaded_at.replace(tzinfo=None)).days > 1:
+                        user.diagnosis_record = True
+                        user.previous_diagnosis_value = value
+                        user.previous_diagnosis_class = str(classes)
+                        user.uploaded_at = datetime.now()
+                        user.save()
 
-        return render(request, 'home.html', context)
-    
-    if user.is_authenticated:
-        return render(request, 'home.html', context)
-    else:
-        return redirect('main:login')
+                except Exception as e:
+                    logger.error(f"Error processing image: {e}")
+                    context['error'] = "An error occurred while processing the image."
+
+    return render(request, 'home.html', context)
 
 def login_view(request):
     if request.method == 'POST':

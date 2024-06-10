@@ -1,4 +1,15 @@
-__pycache__
-db.sqlite3
-*/migrations
-*/creds.py
+# Ignore the media folder
+DRD/media/*
+DRD/media/images
+
+# Ignore the database file
+**/db.sqlite3
+
+# Ignore migrations folders of all apps
+**/migrations/
+
+# Ignore __pycache__ folders of all apps
+**/__pycache__/
+
+# Ignore creds.py in the parent app
+DRD/DRD/creds.py

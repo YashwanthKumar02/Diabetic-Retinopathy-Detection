@@ -34,10 +34,29 @@
                 <div class="card-body">
                     <h3>Hi, {{user}}</h3>
                     <h5 class="card-title">Upload Image</h5>
-                    <input type="file" name="image" class="form-control" style="margin-bottom: 10px;">
+                    {{ form.as_p }}
                     <button type="submit" class="btn btn-primary">Upload</button>
+                    {% if diagnosis_record and check_flag %}
+                        <h5 style="margin-top: 10px;">Previous diagnosis ({{uploaded_at}}): {{previous_diagnosis_class}}</h5>
+                    {% endif %}
                     {% if value %}
-                        <h5 style="margin-top: 10px;">Prediction: {{value}} {{classes}}</h5>
+                        <h5 style="margin-top: 10px;">Prediction: {{classes}}</h5>
+                    {% endif %}
+                    <br>
+                    {% if check_flag and diagnosis_record %}
+                        {% if previous_diagnosis_value < value %}
+                            <div class="alert alert-danger" role="alert">
+                                The severity has been increased from {{previous_diagnosis_class}} to {{classes}}, please take immediate action!
+                            </div>
+                        {% elif previous_diagnosis_value == value %}
+                            <div class="alert alert-warning" role="alert">
+                                The severity has been same as last diagnosis, keep up the good work!
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success" role="alert">
+                                The severity has been decreased from {{previous_diagnosis_class}} to {{classes}}, keep up the good work!
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
