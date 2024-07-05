@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-$fgl&a(*!e4bp)zc^!x=2!n7__6l*0&k6cz2nbted7)g4rxczl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -80,19 +80,51 @@ WSGI_APPLICATION = 'DRD.wsgi.application'
 
 # settings.py
 
-from . import creds
+# from . import creds
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': creds.name,
+#         'USER': creds.user,
+#         'PASSWORD': creds.password,
+#         'HOST': creds.host,  # Or your database server's IP address
+#         'PORT': creds.port,       # Default PostgreSQL port
+#     }
+# }
+
+# settings.py
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': creds.name,
-        'USER': creds.user,
-        'PASSWORD': creds.password,
-        'HOST': creds.host,  # Or your database server's IP address
-        'PORT': creds.port,       # Default PostgreSQL port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # BASE_DIR should already be defined in settings.py
     }
 }
 
+
+# from dotenv import load_dotenv
+
+# # Adjust the path to point to the .env file one directory above settings.py
+# dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+# load_dotenv(dotenv_path)
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('POSTGRES_DB'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('POSTGRES_HOST', 'db'),
+#         'PORT': os.getenv('POSTGRES_PORT', '5432'),
+#     }
+# }
+
+# import dj_database_url
+
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+# }
 
 
 # Password validation
@@ -145,3 +177,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = '/login/'

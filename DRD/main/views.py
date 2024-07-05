@@ -36,38 +36,35 @@ logger = logging.getLogger(__name__)
 def is_not_staff(user):
     return not user.is_staff
 
-@login_required
-@user_passes_test(is_not_staff, login_url='main:login')
+@login_required(login_url='/login/')
 def home(request):
     form = ImageUploadForm()
-    username = request.user.username
-    user = User.objects.get(username=username)
-    context = {'username': username, 'form': form, 'diagnosis_record': user.diagnosis_record}
+    context = {'username': request.user.username, 'form': form, 'diagnosis_record': request.user.diagnosis_record}
 
     if request.method == 'POST':
         form = ImageUploadForm(request.POST, request.FILES)
         if form.is_valid():
             if 'image' in request.FILES:
                 image_file = request.FILES['image']
-                context['check_flag'] = True
                 image_name = default_storage.save(image_file.name, image_file)
                 image_path = os.path.join(settings.MEDIA_ROOT, image_name)
-                
+                context['check_flag'] = True
+
                 try:
                     value, classes = main(image_path)
                     context['value'] = value
                     context['classes'] = str(classes)
-                    if user.diagnosis_record:
-                        context['previous_diagnosis_value'] = user.previous_diagnosis_value
-                        context['previous_diagnosis_class'] = user.previous_diagnosis_class
-                        context['uploaded_at'] = user.uploaded_at
 
-                    if (timezone.now() - user.uploaded_at.replace(tzinfo=None)).days > 1:
-                        user.diagnosis_record = True
-                        user.previous_diagnosis_value = value
-                        user.previous_diagnosis_class = str(classes)
-                        user.uploaded_at = datetime.now()
-                        user.save()
+                    if request.user.uploaded_at is None or (timezone.now() - request.user.uploaded_at).days > 1:
+                        request.user.diagnosis_record = True
+                        request.user.previous_diagnosis_value = value
+                        request.user.previous_diagnosis_class = str(classes)
+                        request.user.uploaded_at = timezone.now()
+                        request.user.save()
+
+                    context['previous_diagnosis_value'] = request.user.previous_diagnosis_value
+                    context['previous_diagnosis_class'] = request.user.previous_diagnosis_class
+                    context['uploaded_at'] = request.user.uploaded_at
 
                 except Exception as e:
                     logger.error(f"Error processing image: {e}")

@@ -68,7 +68,7 @@ def inference(model, file, transform, classes):
         # plt.show()
 
 
-model = load_model("C:/Users/YASHWANTH/OneDrive/Desktop/classifier.pt")
+model = load_model("classifier.pt")
 print("Model loaded Succesfully")
 classes = ['No DR', 'Mild', 'Moderate', 'Severe', 'Proliferative DR']
 test_transforms = torchvision.transforms.Compose([
