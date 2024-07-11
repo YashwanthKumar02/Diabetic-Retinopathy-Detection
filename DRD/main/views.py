@@ -39,7 +39,17 @@ def is_not_staff(user):
 @login_required(login_url='/login/')
 def home(request):
     form = ImageUploadForm()
-    context = {'username': request.user.username, 'form': form, 'diagnosis_record': request.user.diagnosis_record}
+    context = {
+        'username': request.user.username,
+        'form': form,
+        'diagnosis_record': request.user.diagnosis_record,
+        'check_flag': False,
+        'value': None,
+        'classes': None,
+        'previous_diagnosis_value': request.user.previous_diagnosis_value,
+        'previous_diagnosis_class': request.user.previous_diagnosis_class,
+        'uploaded_at': request.user.uploaded_at
+    }
 
     if request.method == 'POST':
         form = ImageUploadForm(request.POST, request.FILES)
@@ -55,6 +65,7 @@ def home(request):
                     context['value'] = value
                     context['classes'] = str(classes)
 
+                    # Check if the user needs to update their diagnosis record
                     if request.user.uploaded_at is None or (timezone.now() - request.user.uploaded_at).days > 1:
                         request.user.diagnosis_record = True
                         request.user.previous_diagnosis_value = value
@@ -87,7 +98,7 @@ def login_view(request):
                 messages.error(request, 'Your account is not active. Please contact admin for verification.')
         else:
             messages.error(request, 'Invalid username or password.')
-    return render(request, 'registration/login.html')
+    return render(request, 'registration/login.html') 
 
 def logout_view(request):
     logout(request)
